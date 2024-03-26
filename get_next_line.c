@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/03/25 15:37:05 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:56:01 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,35 @@
 
 char	*get_next_line(int fd)
 {
-	static int	line;
-	char		c;
-	int			i;
-	char		*str;
-	static int	bytes_read = 0;
+	int bytes_read = 1;
+	int i = 0;
+	int j = 0;
+	char *str;
 
-	line = 0;
-	c = 'c';
-	i = 0;
-	str = (char *)malloc(BUFFER_SIZE - bytes_read * sizeof(char));
-	
-	while (i < BUFFER_SIZE && bytes_read < BUFFER_SIZE)
+	if (fd < 0)
+		return (NULL);
+	str = (char *)malloc(BUFFER_SIZE * sizeof(char));
+	printf("str size: %lu\n", sizeof(str));
+	bytes_read = read(fd, str, BUFFER_SIZE);
+	if (bytes_read == -1 || str == NULL)
+		return (NULL);
+	if (bytes_read == 0) // end of the file has been reached
 	{
-		bytes_read += read(fd, &str[i], 1);
-		// printf("char %d: %c\n", i, str[i]);
-		if (str[i] == '\n')
+		while(str[i])
 		{
-			printf("bytes read: %d\n", bytes_read);
-			return (str);
+			if (str[i] == '\n')
+				break;
+			i++;
 		}
-		i++;
 	}
-	printf("Byte count till end of line: %d\n", i);
-	// int check = read(fd, str, i);
-	// if (check == 0)
-	// 	printf("End of file has been reached.\n");
-	// else if (check == -1)
-	// 	printf("Error reading the file.\n");
-	return (str);
+	char *temp = (char *)malloc(sizeof(str) * sizeof(char));
+	while (str[j])
+	{
+		temp[j] = str[j];
+		j++;
+	}
+
+	return (NULL);
 }
 
 int	main(void)
@@ -51,11 +51,11 @@ int	main(void)
 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
 
 	char *str = get_next_line(fd);
-	printf("%s", str);
-	str = get_next_line(fd);
-	printf("%s", str);
-	str = get_next_line(fd);
-	printf("%s", str);
+	printf("return str: %s", str);
+	// str = get_next_line(fd);
+	// printf("return str: %s", str);
+	// str = get_next_line(fd);
+	// printf("%s", str);
 
 	close(fd);
 	return (0);
