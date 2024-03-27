@@ -12,37 +12,62 @@
 
 #include "get_next_line.h"
 
+char *store_string(char *str, char *buffer)
+{
+	int len = ft_strlen(buffer);
+
+}
+
 char	*get_next_line(int fd)
 {
-	int bytes_read = 1;
-	int i = 0;
-	int j = 0;
-	char *str;
+	static int bytes_read;
+	static int i = 0;
+	static int j = 0;
+	char *buffer;
+	static char *str;
+	static int first_call = 0;
 
-	if (fd < 0)
-		return (NULL);
-	str = (char *)malloc(BUFFER_SIZE * sizeof(char));
-	printf("str size: %lu\n", sizeof(str));
-	bytes_read = read(fd, str, BUFFER_SIZE);
-	if (bytes_read == -1 || str == NULL)
-		return (NULL);
-	if (bytes_read == 0) // end of the file has been reached
+	if (first_call == 0)
 	{
-		while(str[i])
+		str = ft_calloc(1, 1);
+		first_call = 1;
+	}
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
+	if (buffer == NULL)
+		return (NULL);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (bytes_read == -1)
+		return (NULL);
+	str = ft_strjoin(str, buffer);
+	j = i;
+
+	while (bytes_read != 0)
+	{
+		while (str[i] && str[i] != '\n')
 		{
-			if (str[i] == '\n')
-				break;
 			i++;
 		}
+		if (str[i] != '\n')
+		{
+			bytes_read = read(fd, buffer, BUFFER_SIZE);
+			str = ft_strjoin(str, buffer);
+		}
+		if (str[i] == '\n')
+		{
+			i++;
+			free (buffer);
+			return (ft_substr(str, j, i-j));
+		}
 	}
-	char *temp = (char *)malloc(sizeof(str) * sizeof(char));
-	while (str[j])
+	while (str[i] && str[i] != '\n')
 	{
-		temp[j] = str[j];
-		j++;
+		i++;
 	}
-
-	return (NULL);
+	free (buffer);
+	return (ft_substr(str, j, i-j));
 }
 
 int	main(void)
@@ -52,10 +77,10 @@ int	main(void)
 
 	char *str = get_next_line(fd);
 	printf("return str: %s", str);
-	// str = get_next_line(fd);
-	// printf("return str: %s", str);
-	// str = get_next_line(fd);
-	// printf("%s", str);
+	str = get_next_line(fd);
+	printf("return str: %s", str);
+	str = get_next_line(fd);
+	printf("return str: %s", str);
 
 	close(fd);
 	return (0);

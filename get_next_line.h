@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 1
+# define BUFFER_SIZE 42
 #endif
 
 #include <stdio.h>
@@ -24,5 +24,14 @@
 #include <limits.h>
 
 extern char *get_next_line(int fd);
+extern void	*ft_calloc(size_t num, size_t size);
+extern void	ft_bzero(void *s, size_t n);
+extern char	*ft_strjoin(char const *s1, char const *s2);
+extern size_t	ft_strlcat(char *dest, const char *source, size_t size);
+extern size_t	ft_strlen(const char *str);
+extern char	*ft_substr(char const *s, unsigned int start, size_t len);
+
+
+
 
 #endif
