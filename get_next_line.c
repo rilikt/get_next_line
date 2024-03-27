@@ -6,42 +6,51 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/03/26 16:56:01 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/03/27 15:29:46 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *store_string(char *str, char *buffer)
-{
-	int len = ft_strlen(buffer);
+// int ft_checks(int fd, int bytes_read)
+// {
 
-}
+// }
 
 char	*get_next_line(int fd)
 {
-	static int bytes_read;
+	static int bytes_read = 0;
 	static int i = 0;
 	static int j = 0;
 	char *buffer;
 	static char *str;
 	static int first_call = 0;
+	char *restr;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+
+	buffer = calloc(BUFFER_SIZE +1, sizeof(char));
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (bytes_read == -1 || bytes_read == 0 || buffer == NULL)
+	{	
+		free (buffer);
+		return (NULL);
+	}
 
 	if (first_call == 0)
 	{
 		str = ft_calloc(1, 1);
 		first_call = 1;
 	}
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
-	if (buffer == NULL)
-		return (NULL);
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read == -1)
-		return (NULL);
+	
 	str = ft_strjoin(str, buffer);
+	free (buffer);
+	if (str == NULL)
+	{
+		free(str);
+		return (NULL);
+	}
 	j = i;
 
 	while (bytes_read != 0)
@@ -52,36 +61,45 @@ char	*get_next_line(int fd)
 		}
 		if (str[i] != '\n')
 		{
+			buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
 			bytes_read = read(fd, buffer, BUFFER_SIZE);
 			str = ft_strjoin(str, buffer);
+			free (buffer);
+			if (str == NULL)
+			{
+				free (str);
+				free (buffer);
+				return (NULL);
+			}
 		}
-		if (str[i] == '\n')
+		if (str[i] == '\n' || str[i] == '\0')
 		{
 			i++;
-			free (buffer);
 			return (ft_substr(str, j, i-j));
 		}
 	}
+
 	while (str[i] && str[i] != '\n')
 	{
 		i++;
 	}
-	free (buffer);
-	return (ft_substr(str, j, i-j));
+	restr = ft_substr(str, j, i-j -1);
+	free(str);
+	return (restr);
 }
 
-int	main(void)
-{
-	int fd = open("test.txt", O_RDONLY);
-	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
+// int	main(void)
+// {
+// 	int fd = open("1char.txt", O_RDONLY);
+// 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
 
-	char *str = get_next_line(fd);
-	printf("return str: %s", str);
-	str = get_next_line(fd);
-	printf("return str: %s", str);
-	str = get_next_line(fd);
-	printf("return str: %s", str);
+// 	char *str = get_next_line(fd);
+// 	printf("return str: %s", str);
+// 	// str = get_next_line(fd);
+// 	// printf("return str: %s", str);
+// 	// str = get_next_line(fd);
+// 	// printf("return str: %s", str);
 
-	close(fd);
-	return (0);
-}
+// 	close(fd);
+// 	return (0);
+// }
