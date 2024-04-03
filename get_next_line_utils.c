@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/03/27 15:17:56 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:37:57 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	ft_bzero(void *s, size_t n)
 	}
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	int		total_len;
 	char	*str;
@@ -45,9 +45,15 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	total_len = ft_strlen(s1) + ft_strlen(s2) +1;
 	str = (char *)ft_calloc(total_len, sizeof(char));
 	if (str == NULL)
+	{
+		free (s1);
+		free (s2);
 		return (NULL);
+	}
 	ft_strlcat(str, s1, total_len);
 	ft_strlcat(str, s2, total_len);
+	free (s1);
+	free (s2);
 	return (str);
 }
 
@@ -84,7 +90,7 @@ size_t	ft_strlen(const char *str)
 	return (len);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*ft_substr(char *s, unsigned int start, size_t len, int bytes_read)
 {
 	char				*sub;
 	unsigned long int	i;
@@ -100,7 +106,10 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		size = 0;
 	sub = (char *)malloc((size + 1) * sizeof(char));
 	if (sub == NULL)
+	{
+		free(s);
 		return (NULL);
+	}
 	sub[size] = '\0';
 	if (size == 0)
 		return (sub);
@@ -110,5 +119,25 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		start++;
 		i++;
 	}
+	if (bytes_read == 0)
+		free(s);
 	return (sub);
+}
+
+char	*ft_strrchr(const char *str, int c)
+{
+	char	ch;
+	char	*st;
+	int		len;
+
+	st = (char *)str;
+	ch = (char)c;
+	len = ft_strlen(str);
+	while (len >= 0)
+	{
+		if (ch == st[len])
+			return (st + len);
+		len--;
+	}
+	return (0);
 }
