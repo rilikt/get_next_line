@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/03 15:37:57 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:32:37 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ char	*ft_strjoin(char *s1, char *s2)
 	ft_strlcat(str, s2, total_len);
 	free (s1);
 	free (s2);
+	s1 = NULL;
+	s2 = NULL;
 	return (str);
 }
 
@@ -90,7 +92,7 @@ size_t	ft_strlen(const char *str)
 	return (len);
 }
 
-char	*ft_substr(char *s, unsigned int start, size_t len, int bytes_read)
+char	*ft_substr(char *s, unsigned int start, size_t len)
 {
 	char				*sub;
 	unsigned long int	i;
@@ -119,8 +121,6 @@ char	*ft_substr(char *s, unsigned int start, size_t len, int bytes_read)
 		start++;
 		i++;
 	}
-	if (bytes_read == 0)
-		free(s);
 	return (sub);
 }
 

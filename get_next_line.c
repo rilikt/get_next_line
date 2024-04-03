@@ -6,16 +6,12 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/03 15:56:44 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:57:29 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-// int ft_checks(int fd, int bytes_read)
-// {
-
-// }
 
 char	*get_next_line(int fd)
 {
@@ -24,8 +20,9 @@ char	*get_next_line(int fd)
 	static int j = 0;
 	char *buffer;
 	static char *str = NULL;
+	char *restr;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || bytes_read == 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || bytes_read <= 0)
 		return (NULL);
 
 	buffer = calloc(BUFFER_SIZE +1, sizeof(char));
@@ -34,13 +31,13 @@ char	*get_next_line(int fd)
 	
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
 	
-	if (bytes_read <= 0)
+	if (bytes_read < 0)
 	{	
 		free (buffer);
 		return (NULL);
 	}
 
-	if (!str)
+	if (!str && !(bytes_read <= 0))
 		str = ft_calloc(1, 1);
 	if (!str)
 		return (NULL);
@@ -51,12 +48,17 @@ char	*get_next_line(int fd)
 	
 	j = i;
 
+	// printf("bytes read before loop: %d\n", bytes_read);
+
 	while (bytes_read != 0 && !(ft_strrchr(str + i, '\n')))
 	{
 		buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
+		if (!buffer)
+			return (NULL);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{	
+			free (str);
 			free (buffer);
 			return (NULL);
 		}
@@ -64,12 +66,28 @@ char	*get_next_line(int fd)
 		if (!str)
 			return (NULL);
 	}
-
 	while (str[i] && str[i] != '\n')
 		i++;
 	i++;
 	
-	return (ft_substr(str, j, i - j, bytes_read));
+	restr = ft_substr(str, j, i - j);
+	if (!restr)
+	{
+		free (str);
+		return (NULL);
+	}
+	if (bytes_read == 0)
+	{
+		free (str);
+		str = NULL;
+	}
+	if (restr[0] == '\0')
+	{
+		free (restr);
+		return (NULL);
+	}
+	// printf("bytes read: %d\n", bytes_read);
+	return (restr);
 }
 
 // int	main(void)
