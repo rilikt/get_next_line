@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:06:50 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/03 16:03:05 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/06 17:42:56 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ extern size_t	ft_strlcat(char *dest, const char *source, size_t size);
 extern size_t	ft_strlen(const char *str);
 extern char	*ft_substr(char *s, unsigned int start, size_t len);
 extern char	*ft_strrchr(const char *str, int c);
+extern char	*ft_substrr(char *s);
+
+
 
 
 

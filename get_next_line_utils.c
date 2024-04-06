@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/03 16:32:37 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/06 17:42:52 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,11 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		size = str_len - start;
 	if (start >= str_len)
 		size = 0;
+	if (size == 0)
+	{
+		free(s);
+		return (NULL);
+	}
 	sub = (char *)malloc((size + 1) * sizeof(char));
 	if (sub == NULL)
 	{
@@ -113,14 +118,36 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		return (NULL);
 	}
 	sub[size] = '\0';
-	if (size == 0)
-		return (sub);
+
 	while (s[start] && len > i && size != 0)
 	{
 		sub[i] = s[start];
 		start++;
 		i++;
 	}
+	return (sub);
+}
+
+char	*ft_substrr(char *s)
+{
+	if (s[0] == '\0')
+		return (0);
+	char				*sub;
+	int len = ft_strlen(s);
+	int i = 0;
+	sub = (char *)malloc(len+1);
+	if (!sub)
+	{
+		free (s);
+		return (NULL);
+	}
+	sub[len] = '\0';
+	while(s[i])
+	{
+		sub[i] = s[i];
+		i++;
+	}
+	free (s);
 	return (sub);
 }
 

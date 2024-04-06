@@ -1,25 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line copy.c                               :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/06 11:05:44 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/06 17:15:07 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int check_str(char *str, int i)
+char *check_str(char *str, int i)
 {
 	int len = ft_strlen(str);
 
 	if (len - i <= 0)
-		return (0);
+	{
+		free (str);
+		return (NULL);
+	}
 	else 
-		return (1);
+		return (str);
 }
 
 char	*get_next_line(int fd)
@@ -31,45 +34,19 @@ char	*get_next_line(int fd)
 	static char *str = NULL;
 	char *restr;
 
-	// printf("beginning: %d", bytes_read);
-
-	if (bytes_read == -1)
-		bytes_read = 1;
-
-	if (fd < 0 || BUFFER_SIZE <= 0 || (bytes_read == 0 && str == NULL))
-	{	
-		i = 0;
-		j = 0;
-		// free (str);
-		// str = NULL;
-		return (NULL);
-	}
-
-	buffer = calloc(BUFFER_SIZE +1, sizeof(char));
-	if (!buffer)
-		return (NULL);
-	// printf("middle: %d ", bytes_read);
-
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	// printf("bytes read: %d ", bytes_read);
+	// printf("|beginning: %d |", bytes_read);
 
 	if (bytes_read < 0)
-	{	
-		i = 0;
-		j = 0;
-		free (str);
-		str = NULL;
-		free (buffer);
-		// printf ("entered first -1 check ");
+		bytes_read = 1;
+
+	// printf("|after cond: %d |", bytes_read);
+	
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || (bytes_read == 0 && str == NULL))
 		return (NULL);
-	}
 
 	if (!str)
 		str = ft_calloc(1, 1);
-	if (!str)
-		return (NULL);
-	
-	str = ft_strjoin(str, buffer);
 	if (!str)
 		return (NULL);
 	
@@ -81,8 +58,9 @@ char	*get_next_line(int fd)
 		if (!buffer)
 			return (NULL);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read < 0)
+		if (bytes_read == -1)
 		{	
+			// printf("|x|entered -1 condition|x|");
 			i = 0;
 			j = 0;
 			free (str);
@@ -94,33 +72,24 @@ char	*get_next_line(int fd)
 		if (!str)
 			return (NULL);
 	}
+
+	// printf("|after loop: %d |", bytes_read);
+
+	
 	while (str[i] && str[i] != '\n')
 		i++;
 	i++;
 	
 	restr = ft_substr(str, j, i - j);
+
 	if (!restr)
 	{
-		free (str);
-		return (NULL);
-	}
-	if (bytes_read == 0)
-	{
-		if (check_str(str, i) == 0)
-		{
-			free (str);
-			str = NULL;
-		}
-	}
-	if (restr[0] == '\0')
-	{
-		free (restr);
-		free (str);
 		str = NULL;
-		// printf("end : %d ", bytes_read);
 		return (NULL);
 	}
-	// printf("end : %d", bytes_read);
+
+	if (bytes_read == 0)
+		str = check_str(str, i);
 
 	return (restr);
 }
