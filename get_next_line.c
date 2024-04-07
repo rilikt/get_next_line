@@ -12,53 +12,15 @@
 
 #include "get_next_line.h"
 
-char *check_str(char *str, int i)
+char *ft_read_file (int fd, char *str)
 {
-	int len = ft_strlen(str);
-
-	if (len - i <= 0)
-	{
-		free (str);
-		return (NULL);
-	}
-	else 
-		return (str);
-}
-
-char	*get_next_line(int fd)
-{
-	static int bytes_read = 1;
-	static int i = 0;
-	static int j = 0;
 	char *buffer;
-	char *str = NULL;
-	static char *idk = NULL;
-	char *restr;
-
-	printf("|beginning: %d |", bytes_read);
-
-
-	// if (bytes_read < 0)	
-	// {
-	// 	bytes_read = 1;
-	// 	return (NULL);
-	// }
-
-	if (fd < 0 || BUFFER_SIZE <= 0 || (bytes_read == 0 && str == NULL) || read(fd, 0, 0) < 0)
-	{
-		return (NULL);
-	}
-
-	if (!str)
-	{
-		str = ft_calloc(1, 1);
-	}
+	int bytes_read = 1;
+			
 	if (!str)
 		return (NULL);
 	
-	j = i;
-
-	while (bytes_read > 0 && !(ft_strrchr(str + i, '\n')))
+	while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
 	{
 		buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
 		if (!buffer)
@@ -66,10 +28,6 @@ char	*get_next_line(int fd)
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{	
-			i = 0;
-			j = 0;
-			free (str);
-			str = NULL;
 			free (buffer);
 			return (NULL);
 		}
@@ -77,55 +35,85 @@ char	*get_next_line(int fd)
 		if (!str)
 			return (NULL);
 	}
-
-	printf("|after loop: %d |", bytes_read);
-
-
-	if (bytes_read < 0)
-	{
-		bytes_read = 1;
-		return (NULL);
-	}
-
-
-
-	while (str[i] && str[i] != '\n')
-		i++;
-	i++;
-	
-	restr = ft_substr(str, j, i - j);
-
-	if (!restr)
-	{
-		str = NULL;
-		return (NULL);
-	}
-
-	if (bytes_read == 0)
-		str = check_str(str, i);
-
-	return (restr);
+	return (str);
 }
 
-// int	main(void)
-// {
-// 	int fd = open("1char.txt", O_RDONLY);
-// 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
+char *get_line(char *str)
+{
+	int i = 0;
+	char *return_str;
 
-// 	char *str = get_next_line(fd);
-// 	printf("return str1: %s", str);
-// 	str = get_next_line(fd);
-// 	printf("return str2: %s", str);
-// 	fd = open("test.txt", O_RDONLY);
-// 	str = get_next_line(fd);
-// 	printf("return str3: %s", str);
-// 	str = get_next_line(fd);
-// 	printf("return str4: %s", str);
-// 	str = get_next_line(fd);
-// 	printf("return str5: %s", str);
+	if (str[i] == '\0')
+		return(NULL);
+	while(str[i] && str[i] != '\n')
+		i++;
+	return_str = ft_substr(str, 0, i + 1);
+	if (return_str == NULL)
+		return (NULL);
+	return (return_str);
+}
 
-// 	free(str);
-// 	close(fd);
+char *store_remaining(char *str)
+{
+	int i = 0;
+	char *return_str;
+
+	while(str[i] && str[i] != '\n')
+		i++;
+	if (str[i] == '\0')
+	{
+		free(str);
+		return(NULL);
+	}
+	i++;
+	return_str = ft_substr(str, i, ft_strlen(str) - i);
+	free(str);
+	printf("remaining chars: %s ", return_str);
+	return(return_str);
+}
+
+char	*get_next_line(int fd)
+{
+	static char *str = NULL;
+	char *return_str;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+		return (NULL);
 	
-// 	return (0);
-// }
+	if (!str)
+		str = ft_calloc(1, 1); // maybe move this
+	
+	str = ft_read_file(fd, str);
+	if (str == NULL)
+		return (NULL);
+	
+	return_str = get_line(str);
+	if (return_str == NULL)
+		return (NULL);
+	
+	str = store_remaining(str);
+
+	return (return_str);
+}
+
+int	main(void)
+{
+	int fd = open("test.txt", O_RDONLY);
+	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
+
+	char *str = get_next_line(fd);
+	printf("return str1: %s", str);
+	str = get_next_line(fd);
+	printf("return str2: %s", str);
+	str = get_next_line(fd);
+	printf("return str3: %s", str);
+	// str = get_next_line(fd);
+	// printf("return str4: %s", str);
+	// str = get_next_line(fd);
+	// printf("return str5: %s", str);
+
+	free(str);
+	close(fd);
+	
+	return (0);
+}
