@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/06 17:42:52 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/07 18:35:29 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	*ft_calloc(size_t num, size_t size)
 	void	*ptr;
 
 	ptr = malloc(num * size);
-	if (ptr == NULL)
+	if (!ptr)
 		return (NULL);
 	ft_bzero(ptr, num * size);
 	return (ptr);
@@ -44,7 +44,7 @@ char	*ft_strjoin(char *s1, char *s2)
 
 	total_len = ft_strlen(s1) + ft_strlen(s2) +1;
 	str = (char *)ft_calloc(total_len, sizeof(char));
-	if (str == NULL)
+	if (!str)
 	{
 		free (s1);
 		free (s2);
@@ -53,9 +53,6 @@ char	*ft_strjoin(char *s1, char *s2)
 	ft_strlcat(str, s1, total_len);
 	ft_strlcat(str, s2, total_len);
 	free (s1);
-	free (s2);
-	s1 = NULL;
-	s2 = NULL;
 	return (str);
 }
 
@@ -125,6 +122,7 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		start++;
 		i++;
 	}
+	free (s);
 	return (sub);
 }
 

@@ -6,26 +6,65 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/07 18:53:57 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/06 17:15:07 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *ft_read_file (int fd, char *str)
+char *check_str(char *str, int i)
 {
-	char *buffer;
-	int bytes_read = 1;
+	int len = ft_strlen(str);
 
-
-
-	buffer = ft_calloc((BUFFER_SIZE +1), sizeof(char));
-
-	while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
+	if (len - i <= 0)
 	{
+		free (str);
+		return (NULL);
+	}
+	else 
+		return (str);
+}
+
+char	*get_next_line(int fd)
+{
+	static int bytes_read = 1;
+	static int i = 0;
+	static int j = 0;
+	char *buffer;
+	static char *str = NULL;
+	char *restr;
+
+	// printf("|beginning: %d |", bytes_read);
+
+	if (bytes_read < 0)
+		bytes_read = 1;
+
+	// printf("|after cond: %d |", bytes_read);
+	
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || (bytes_read == 0 && str == NULL))
+		return (NULL);
+
+	if (!str)
+		str = ft_calloc(1, 1);
+	if (!str)
+		return (NULL);
+	
+	j = i;
+
+	while (bytes_read != 0 && !(ft_strrchr(str + i, '\n')))
+	{
+		buffer = ft_calloc(BUFFER_SIZE +1, sizeof(char));
+		if (!buffer)
+			return (NULL);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read < 0)
+		if (bytes_read == -1)
 		{	
+			// printf("|x|entered -1 condition|x|");
+			i = 0;
+			j = 0;
+			free (str);
+			str = NULL;
 			free (buffer);
 			return (NULL);
 		}
@@ -33,87 +72,44 @@ char *ft_read_file (int fd, char *str)
 		if (!str)
 			return (NULL);
 	}
-	free (buffer);
-	return (str);
-}
 
-char *grab_line(char *str)
-{
-	int i = 0;
-	char *return_str;
+	// printf("|after loop: %d |", bytes_read);
 
-	if (str[i] == '\0')
-	{
-		return(NULL);
-	}
-	while(str[i] && str[i] != '\n')
+	
+	while (str[i] && str[i] != '\n')
 		i++;
-	return_str = ft_substr(str, 0, i + 1);
-	if (return_str == NULL)
-		return (NULL);
-	return (return_str);
-}
-
-char *store_remaining(char *str)
-{
-	int i = 0;
-	char *return_str;
-
-	// if (!str)
-	// 	return (NULL);
-
-	while(str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\0')
-	{
-		free(str);
-		return(NULL);
-	}
 	i++;
-	return_str = ft_substr(str, i, ft_strlen(str) - i);
-	// printf("remaining chars: %s ", return_str);
-	return(return_str);
-}
+	
+	restr = ft_substr(str, j, i - j);
 
-char	*get_next_line(int fd)
-{
-	static char *str;
-	char *return_str;
-
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (!restr)
+	{
+		str = NULL;
 		return (NULL);
-	
-	if (!str)
-		str = ft_calloc(1, 1); // maybe move this
+	}
 
-	str = ft_read_file(fd, str);
-	if (!str)
-		return (NULL);
+	if (bytes_read == 0)
+		str = check_str(str, i);
 
-	
-	return_str = grab_line(str);
-	
-	str = store_remaining(str);
-
-		
-	return (return_str);
+	return (restr);
 }
 
 // int	main(void)
 // {
-// 	int fd = open("test.txt", O_RDONLY);
+// 	int fd = open("1char.txt", O_RDONLY);
 // 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
 
 // 	char *str = get_next_line(fd);
 // 	printf("return str1: %s", str);
 // 	str = get_next_line(fd);
 // 	printf("return str2: %s", str);
+// 	fd = open("test.txt", O_RDONLY);
 // 	str = get_next_line(fd);
 // 	printf("return str3: %s", str);
-// 	// str = get_next_line(fd);
-// 	// printf("return str4: %s", str);
-// 	// str = get_next_line(fd);
-// 	// printf("return str5: %s", str);
+// 	str = get_next_line(fd);
+// 	printf("return str4: %s", str);
+// 	str = get_next_line(fd);
+// 	printf("return str5: %s", str);
 
 // 	free(str);
 // 	close(fd);
