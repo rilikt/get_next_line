@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/08 13:02:33 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/08 17:00:57 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,38 @@
 char *ft_read_file (int fd, char *str)
 {
 	char *buffer;
-	int bytes_read = 1;
+	static int bytes_read = 1;
+	static int err = 0;
+
+	if (err == 1 && bytes_read == 0)
+	{
+		bytes_read = 1;
+		err = 0;
+	}
 
 		// printf("entered read\n");
-
-
-	buffer = (char *)malloc(BUFFER_SIZE + 1);
-	// if (!buffer)
-	// 	return (NULL);
+	// printf("bytes read: %d ", bytes_read);
+	
+	if (!str && bytes_read != 0)
+		str = ft_calloc(1, 1); // maybe move this
 	if (!str)
 		return (NULL);
-	while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
+
+	buffer = (char *)malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+
+	while (bytes_read > 0 && !(ft_strrchr(str, '\n')))
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{	
+			// printf("entered -1 ");
+
 			free (buffer);
+			free(str);
+			bytes_read = 1;
+			err++;
 			return (NULL);
 		}
 		buffer[bytes_read] = '\0';
@@ -38,8 +54,10 @@ char *ft_read_file (int fd, char *str)
 		if (!str)
 			return (NULL);
 	}
+	// printf("bytes read: %d ", bytes_read);
+
 	free (buffer);
-	// printf("after read and join: %s\n", str);
+	// printf("after read and join: %s ", str);
 
 	return (str);
 }
@@ -76,12 +94,12 @@ char *grab_line(char *str)
 
 char *store_remaining(char *str)
 {
-	// printf("entered store: %s\n", str);
+	// printf("entered store: %s ", str);
 
 	int i = 0;
 	char *return_str;
 
-	// printf("entered store\n");
+	// printf("entered store ");
 
 
 	while(str[i] && str[i] != '\n')
@@ -105,21 +123,24 @@ char	*get_next_line(int fd)
 	static char *str = NULL;
 	char *return_str;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0) // || read(fd, 0, 0) < 0
+	{
+		if (str)
+		{
+			free (str);
+			str = NULL;
+		}
 		return (NULL);
+	}	
 	
-	// printf("str: %s\n", str);
-	
-	if (!str)
-		str = ft_calloc(1, 1); // maybe move this
-	if (!str)
-		return (NULL);
-	
-	// printf("str2: %s\n", str);
+	// printf("str: %s ", str);
 
 	str = ft_read_file(fd, str);
 	if (!str)
 	{
+		// printf("entered cond ");
+
+		free (str);
 		return (NULL);
 	}
 
@@ -127,11 +148,6 @@ char	*get_next_line(int fd)
 	return_str = grab_line(str);
 	// if (!return_str)
 	// {	
-	// 	if (str)
-	// 	{
-	// 		str = NULL;
-	// 		free(str);
-	// 	}
 	// 	return (NULL);
 	// }
 	
@@ -143,24 +159,24 @@ char	*get_next_line(int fd)
 	return (return_str);
 }
 
-int	main(void)
-{
-	int fd = open("1char.txt", O_RDONLY);
-	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
+// int	main(void)
+// {
+// 	int fd = open("1char.txt", O_RDONLY);
+// 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
 
-	char *str = get_next_line(fd);
-	printf("return str1: %s", str);
-	str = get_next_line(fd);
-	printf("return str2: %s", str);
-	str = get_next_line(fd);
-	printf("return str3: %s", str);
-	str = get_next_line(fd);
-	printf("return str4: %s", str);
-	// str = get_next_line(fd);
-	// printf("return str5: %s", str);
+// 	char *str = get_next_line(fd);
+// 	printf("return str1: %s", str);
+// 	str = get_next_line(fd);
+// 	printf("return str2: %s", str);
+// 	str = get_next_line(fd);
+// 	printf("return str3: %s", str);
+// 	str = get_next_line(fd);
+// 	printf("return str4: %s", str);
+// 	// str = get_next_line(fd);
+// 	// printf("return str5: %s", str);
 
-	free(str);
-	close(fd);
+// 	free(str);
+// 	close(fd);
 	
-	return (0);
-}
+// 	return (0);
+// }
