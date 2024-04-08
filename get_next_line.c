@@ -53,11 +53,7 @@ char *grab_line(char *str)
 
 	// printf("entered grab\n");
 
-
-	if (!str)
-		return (NULL);
-
-	if (str[i] == '\0')
+	if (!str[i])
 	{
 		// free(str);
 		return (NULL);
@@ -87,18 +83,19 @@ char *store_remaining(char *str)
 
 	// printf("entered store\n");
 
-	if (!str)
-	{
-		// printf("entered cond\n");
 
-		return(NULL);
-	}
 	while(str[i] && str[i] != '\n')
 		i++;
 
+	if (!str[i])
+	{
+		free(str);
+		return (NULL);
+	}
+
 	i++;
 	return_str = ft_substr(str, i, ft_strlen(str) - i);
-	// free (str);
+	free (str);
 	// printf("remaining chars: %s ", return_str);
 	return(return_str);
 }
@@ -146,24 +143,24 @@ char	*get_next_line(int fd)
 	return (return_str);
 }
 
-// int	main(void)
-// {
-// 	int fd = open("1char.txt", O_RDONLY);
-// 	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
+int	main(void)
+{
+	int fd = open("1char.txt", O_RDONLY);
+	printf("\n----\nFD: %d\nBUFFER_SIZE: %d\n----\n\n", fd, BUFFER_SIZE);
 
-// 	char *str = get_next_line(fd);
-// 	printf("return str1: %s\n", str);
-// 	str = get_next_line(fd);
-// 	printf("return str2: %s\n", str);
-// 	str = get_next_line(fd);
-// 	printf("return str3: %s\n", str);
-// 	str = get_next_line(fd);
-// 	printf("return str4: %s", str);
-// 	// str = get_next_line(fd);
-// 	// printf("return str5: %s", str);
+	char *str = get_next_line(fd);
+	printf("return str1: %s", str);
+	str = get_next_line(fd);
+	printf("return str2: %s", str);
+	str = get_next_line(fd);
+	printf("return str3: %s", str);
+	str = get_next_line(fd);
+	printf("return str4: %s", str);
+	// str = get_next_line(fd);
+	// printf("return str5: %s", str);
 
-// 	free(str);
-// 	close(fd);
+	free(str);
+	close(fd);
 	
-// 	return (0);
-// }
+	return (0);
+}

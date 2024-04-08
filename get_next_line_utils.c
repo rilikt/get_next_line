@@ -108,13 +108,13 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		size = 0;
 	if (size == 0)
 	{
-		free(s);
+		// free(s);
 		return (NULL);
 	}
 	sub = (char *)malloc((size + 1) * sizeof(char));
 	if (sub == NULL)
 	{
-		free(s);
+		// free(s);
 		return (NULL);
 	}
 	sub[size] = '\0';
