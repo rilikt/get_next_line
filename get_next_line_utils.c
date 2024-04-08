@@ -122,7 +122,6 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 		start++;
 		i++;
 	}
-	free (s);
 	return (sub);
 }
 
