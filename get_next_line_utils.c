@@ -6,7 +6,7 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/07 18:35:29 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/08 12:32:51 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ char	*ft_strjoin(char *s1, char *s2)
 	char	*str;
 
 	total_len = ft_strlen(s1) + ft_strlen(s2) +1;
+	// printf("total len: %d\n", total_len);
+	
 	str = (char *)ft_calloc(total_len, sizeof(char));
 	if (!str)
 	{
@@ -99,6 +101,7 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 	i = 0;
 	size = len;
 	str_len = ft_strlen(s);
+	// printf("len: %d\n", str_len);
 	if (start + len > str_len)
 		size = str_len - start;
 	if (start >= str_len)
