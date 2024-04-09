@@ -6,79 +6,56 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:15:27 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/08 12:32:51 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/09 14:46:06 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-
 void	*ft_calloc(size_t num, size_t size)
 {
-	void	*ptr;
+	void			*ptr;
+	unsigned char	*p;
+	int				n;
 
-	ptr = malloc(num * size);
+	n = num * size;
+	ptr = malloc(n);
 	if (!ptr)
 		return (NULL);
-	ft_bzero(ptr, num * size);
-	return (ptr);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	unsigned char	*p;
-
-	p = (unsigned char *)s;
+	p = (unsigned char *)ptr;
 	while (n > 0)
 	{
 		*p = 0;
 		p++;
 		n--;
 	}
+	return (ptr);
 }
 
 char	*ft_strjoin(char *s1, char *s2)
 {
-	int		total_len;
 	char	*str;
+	int		i;
+	int		j;
 
-	total_len = ft_strlen(s1) + ft_strlen(s2) +1;
-	// printf("total len: %d\n", total_len);
-	
-	str = (char *)ft_calloc(total_len, sizeof(char));
+	i = 0;
+	j = 0;
+	str = (char *)ft_calloc(ft_strlen(s1) + ft_strlen(s2) + 1, sizeof(char));
 	if (!str)
 	{
-		free (s1);
-		free (s2);
+		free(s1);
+		free(s2);
 		return (NULL);
 	}
-	ft_strlcat(str, s1, total_len);
-	ft_strlcat(str, s2, total_len);
-	free (s1);
-	return (str);
-}
-
-size_t	ft_strlcat(char *dest, const char *source, size_t size)
-{
-	unsigned long int	dest_len;
-	unsigned long int	source_len;
-	unsigned long int	i;
-	unsigned long int	n;
-
-	dest_len = ft_strlen(dest);
-	source_len = ft_strlen(source);
-	i = 0;
-	if (dest_len < size)
-		n = dest_len + source_len;
-	else
-		n = source_len + size;
-	while (source[i] && (dest_len + i) < size - 1 && size != 0)
+	while (s1[i])
 	{
-		dest[dest_len + i] = source[i];
+		str[i] = s1[i];
 		i++;
 	}
-	dest[dest_len + i] = '\0';
-	return (n);
+	while (s2[j])
+		str[i++] = s2[j++];
+	free(s1);
+	return (str);
 }
 
 size_t	ft_strlen(const char *str)
@@ -101,53 +78,22 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 	i = 0;
 	size = len;
 	str_len = ft_strlen(s);
-	// printf("len: %d\n", str_len);
 	if (start + len > str_len)
 		size = str_len - start;
 	if (start >= str_len)
 		size = 0;
 	if (size == 0)
-	{
-		// free(s);
 		return (NULL);
-	}
 	sub = (char *)malloc((size + 1) * sizeof(char));
 	if (sub == NULL)
-	{
-		// free(s);
 		return (NULL);
-	}
 	sub[size] = '\0';
-
 	while (s[start] && len > i && size != 0)
 	{
 		sub[i] = s[start];
 		start++;
 		i++;
 	}
-	return (sub);
-}
-
-char	*ft_substrr(char *s)
-{
-	if (s[0] == '\0')
-		return (0);
-	char				*sub;
-	int len = ft_strlen(s);
-	int i = 0;
-	sub = (char *)malloc(len+1);
-	if (!sub)
-	{
-		free (s);
-		return (NULL);
-	}
-	sub[len] = '\0';
-	while(s[i])
-	{
-		sub[i] = s[i];
-		i++;
-	}
-	free (s);
 	return (sub);
 }
 
