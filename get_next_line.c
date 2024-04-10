@@ -12,40 +12,88 @@
 
 #include "get_next_line.h"
 
-char	*ft_read_file(int fd, char *str)
+static char	*read_into_buffer(int fd, int *bytes_read)
 {
-	char		*buffer;
-	static int	bytes_read = 1;
-	static int	err = 0;
-
-	if (err == 1 && bytes_read == 0)
-	{
-		bytes_read = 1;
-		err = 0;
-	}
-	if (!str && bytes_read != 0)
-		str = ft_calloc(1, 1);
-	if (!str)
+	char *buffer;
+	
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
 		return (NULL);
-	buffer = (char *)malloc(BUFFER_SIZE + 1);
-	while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
+	*bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (*bytes_read < 0)
 	{
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read < 0)
-		{
-			free(buffer);
-			free(str);
-			err = 1;
-			return (NULL);
-		}
-		buffer[bytes_read] = '\0';
-		str = ft_strjoin(str, buffer);
-		if (!str)
-			return (NULL);
+		free(buffer);
+		return (NULL);
 	}
-	free(buffer);
-	return (str);
+	buffer[*bytes_read] = '\0';
+	return (buffer);
 }
+
+char *ft_read_file(int fd, char *str)
+{
+    int bytes_read = 1;
+    static int err = 0;
+	char *buffer;
+
+    if (err == 1 && bytes_read == 0)
+    {
+        bytes_read = 1;
+        err = 0;
+    }
+    if (!str && bytes_read != 0)
+        str = calloc(1, 1);
+    if (!str)
+        return NULL;
+    while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
+    {
+        buffer = read_into_buffer(fd, &bytes_read);
+        if (!buffer)
+        {
+            free(str);
+            return NULL;
+        }
+        str = ft_strjoin(str, buffer);
+        free(buffer);
+        if (!str)
+            return NULL;
+    }
+    return str;
+}
+
+// char	*ft_read_file(int fd, char *str)
+// {
+// 	char		*buffer;
+// 	static int	bytes_read = 1;
+// 	static int	err = 0;
+
+// 	if (err == 1 && bytes_read == 0)
+// 	{
+// 		bytes_read = 1;
+// 		err = 0;
+// 	}
+// 	if (!str && bytes_read != 0)
+// 		str = ft_calloc(1, 1);
+// 	if (!str)
+// 		return (NULL);
+// 	buffer = (char *)malloc(BUFFER_SIZE + 1);
+// 	while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
+// 	{
+// 		bytes_read = read(fd, buffer, BUFFER_SIZE);
+// 		if (bytes_read < 0)
+// 		{
+// 			free(buffer);
+// 			free(str);
+// 			err = 1;
+// 			return (NULL);
+// 		}
+// 		buffer[bytes_read] = '\0';
+// 		str = ft_strjoin(str, buffer);
+// 		if (!str)
+// 			return (NULL);
+// 	}
+// 	free(buffer);
+// 	return (str);
+// }
 
 char	*grab_line(char *str)
 {
