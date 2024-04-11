@@ -6,58 +6,59 @@
 /*   By: timschmi <timschmi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/25 13:01:14 by timschmi          #+#    #+#             */
-/*   Updated: 2024/04/09 15:40:55 by timschmi         ###   ########.fr       */
+/*   Updated: 2024/04/11 14:07:50 by timschmi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*read_into_buffer(int fd, int *bytes_read)
+char	*read_file_contents(int fd, char *str, int *bytes_read, int *err)
 {
-	char *buffer;
-	
-	buffer = malloc(BUFFER_SIZE + 1);
+	char	*buffer;
+
+	buffer = (char *)malloc(BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
-	*bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (*bytes_read < 0)
+	while (*bytes_read != 0 && !(ft_strrchr(str, '\n')))
 	{
-		free(buffer);
-		return (NULL);
+		*bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (*bytes_read < 0)
+		{
+			free(buffer);
+			*err = 1;
+			return (NULL);
+		}
+		buffer[*bytes_read] = '\0';
+		str = ft_strjoin(str, buffer);
+		if (!str)
+			return (NULL);
 	}
-	buffer[*bytes_read] = '\0';
-	return (buffer);
+	free(buffer);
+	return (str);
 }
 
-char *ft_read_file(int fd, char *str)
+char	*ft_read_file(int fd, char *str)
 {
-    int bytes_read = 1;
-    static int err = 0;
-	char *buffer;
+	char		*file_contents;
+	static int	bytes_read = 1;
+	static int	err = 0;
 
-    if (err == 1 && bytes_read == 0)
-    {
-        bytes_read = 1;
-        err = 0;
-    }
-    if (!str && bytes_read != 0)
-        str = calloc(1, 1);
-    if (!str)
-        return NULL;
-    while (bytes_read != 0 && !(ft_strrchr(str, '\n')))
-    {
-        buffer = read_into_buffer(fd, &bytes_read);
-        if (!buffer)
-        {
-            free(str);
-            return NULL;
-        }
-        str = ft_strjoin(str, buffer);
-        free(buffer);
-        if (!str)
-            return NULL;
-    }
-    return str;
+	if (err == 1 && bytes_read == 0)
+	{
+		bytes_read = 1;
+		err = 0;
+	}
+	if (!str && bytes_read != 0)
+		str = ft_calloc(1, 1);
+	if (!str)
+		return (NULL);
+	file_contents = read_file_contents(fd, str, &bytes_read, &err);
+	if (!file_contents)
+	{
+		free(str);
+		return (NULL);
+	}
+	return (file_contents);
 }
 
 // char	*ft_read_file(int fd, char *str)
