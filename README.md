@@ -32,10 +32,6 @@ char *get_next_line(int fd);
 - No global variables allowed
 - Must compile with: `-Wall -Wextra -Werror -D BUFFER_SIZE=n`
 
-```bash
-cc -Wall -Wextra -Werror -D BUFFER_SIZE=42 get_next_line.c get_next_line_utils.c
-```
-
 ---
 
 ## 🧬 Example Integration
